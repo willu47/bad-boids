@@ -15,18 +15,23 @@ boid_x_velocities=[random.uniform(0,10.0) for x in range(50)]
 boid_y_velocities=[random.uniform(-20.0,20.0) for x in range(50)]
 boids=(boids_x,boids_y,boid_x_velocities,boid_y_velocities)
 
+def move_boids(boid_velocities, boid_position):
+    number_of_boids = len(boid_position)
+    array_of_boids =  range(number_of_boids)
+    for i in array_of_boids:
+        for j in array_of_boids:
+            boid_velocities[i] = boid_velocities[i] + \
+                (boid_position[j] - boid_position[i]) * 0.01 / number_of_boids
+
 def update_boids(boids):
     xs,ys,xvs,yvs=boids
     number_of_boids = len(xs)
     array_of_boids =  range(number_of_boids)
 	
     # Fly towards the middle
-    for i in array_of_boids:
-        for j in array_of_boids:
-            xvs[i]=xvs[i]+(xs[j]-xs[i])*0.01/number_of_boids
-    for i in array_of_boids:
-        for j in array_of_boids:
-            yvs[i]=yvs[i]+(ys[j]-ys[i])*0.01/number_of_boids
+    move_boids(xvs, xs)
+    move_boids(yvs, ys)
+    
     # Fly away from nearby boids
     for i in array_of_boids:
         for j in array_of_boids:
