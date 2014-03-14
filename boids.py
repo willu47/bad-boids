@@ -3,6 +3,45 @@ A deliberately bad implementation of [Boids](http://dl.acm.org/citation.cfm?doid
 for use as an exercise on refactoring.
 """
 
+class Boid(object):
+    """
+    A class of object to represent the birds
+    Parameters:
+        number_of_boids -   class member variable which counts the
+                            number of boids initialised
+
+
+    """
+
+    number_of_boids = 0
+
+    def __init__(self):
+        Boid.number_of_boids += 1
+
+    @classmethod
+    def get_number_of_boids(self):
+        return Boid.number_of_boids
+
+class Boids(object):
+    """
+    A flock of Boid objects
+    Parameters:
+        xs  -   Vector of x positions
+        ys  -   Vector of y positions
+        xvs -   Vector of x vectors
+        yvs -   Vector of y vectors
+    """
+
+    def __init__(self,xs,ys,xvs,yvs):
+        self.xs = xs
+        self.ys = ys
+        self.xvs = xvs
+        self.yvs = yvs
+
+
+
+
+
 from matplotlib import pyplot as plt
 from matplotlib import animation
 import random
@@ -24,14 +63,14 @@ def move_boids(boid_velocities, boid_position):
                 (boid_position[j] - boid_position[i]) * 0.01 / number_of_boids
 
 def update_boids(boids):
-    xs,ys,xvs,yvs=boids
+    xs,ys,xvs,yvs = boids
     number_of_boids = len(xs)
     array_of_boids =  range(number_of_boids)
-	
+
     # Fly towards the middle
     move_boids(xvs, xs)
     move_boids(yvs, ys)
-    
+
     # Fly away from nearby boids
     for i in array_of_boids:
         for j in array_of_boids:
