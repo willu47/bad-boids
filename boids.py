@@ -54,35 +54,35 @@ boid_x_velocities=[random.uniform(0,10.0) for x in range(50)]
 boid_y_velocities=[random.uniform(-20.0,20.0) for x in range(50)]
 boids=(boids_x,boids_y,boid_x_velocities,boid_y_velocities)
 
-def move_boids(boid_velocities, boid_position):
+def move_boids(boid_velocities, boid_position, centre_attraction):
     number_of_boids = len(boid_position)
     array_of_boids =  range(number_of_boids)
     for i in array_of_boids:
         for j in array_of_boids:
             boid_velocities[i] = boid_velocities[i] + \
-                (boid_position[j] - boid_position[i]) * 0.01 / number_of_boids
+                (boid_position[j] - boid_position[i]) * centre_attraction / number_of_boids
 
-def update_boids(boids):
+def update_boids(boids, bird_repulsion, centre_attraction, speed_threshold, acceleration):
     xs,ys,xvs,yvs = boids
     number_of_boids = len(xs)
     array_of_boids =  range(number_of_boids)
 
     # Fly towards the middle
-    move_boids(xvs, xs)
-    move_boids(yvs, ys)
+    move_boids(xvs, xs, centre_attraction)
+    move_boids(yvs, ys, centre_attraction)
 
     # Fly away from nearby boids
     for i in array_of_boids:
         for j in array_of_boids:
-            if (xs[j]-xs[i])**2 + (ys[j]-ys[i])**2 < 100:
+            if (xs[j]-xs[i])**2 + (ys[j]-ys[i])**2 < bird_repulsion:
                 xvs[i]=xvs[i]+(xs[i]-xs[j])
                 yvs[i]=yvs[i]+(ys[i]-ys[j])
     # Try to match speed with nearby boids
     for i in array_of_boids:
         for j in array_of_boids:
-            if (xs[j]-xs[i])**2 + (ys[j]-ys[i])**2 < 10000:
-                xvs[i]=xvs[i]+(xvs[j]-xvs[i])*0.125/number_of_boids
-                yvs[i]=yvs[i]+(yvs[j]-yvs[i])*0.125/number_of_boids
+            if (xs[j]-xs[i])**2 + (ys[j]-ys[i])**2 < speed_threshold:
+                xvs[i]=xvs[i]+(xvs[j]-xvs[i])*acceleration/number_of_boids
+                yvs[i]=yvs[i]+(yvs[j]-yvs[i])*acceleration/number_of_boids
     # Move according to velocities
     for i in array_of_boids:
         xs[i]=xs[i]+xvs[i]
@@ -94,7 +94,11 @@ axes=plt.axes(xlim=(-500,1500), ylim=(-500,1500))
 scatter=axes.scatter(boids[0],boids[1])
 
 def animate(frame):
-    update_boids(boids)
+    repulsion = 100
+    attraction = 0.01
+    speed_threshold = 10000
+    acceleration = 0.125
+    update_boids(boids, repulsion, attraction, speed_threshold, acceleration)
     scatter.set_offsets(zip(boids[0],boids[1]))
 
 
