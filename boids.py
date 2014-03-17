@@ -2,11 +2,7 @@
 A deliberately bad implementation of [Boids](http://dl.acm.org/citation.cfm?doid=37401.37406)
 for use as an exercise on refactoring.
 """
-
-from matplotlib import pyplot as plt
-from matplotlib import animation
 import random
-
 
 class Boid(object):
     """
@@ -43,23 +39,32 @@ class Boids(object):
         yvs -   Vector of y vectors
     """
 
-    def __init__(self,number_of_boids,repulsion = 100, \
+    def __init__(self,number_of_boids = 50,repulsion = 100, \
                     attraction = 0.01, speed_threshold = 10000, \
                     acceleration = 0.125):
         self.boids = []
-        for i in range(1,number_of_boids):
+        self.repulsion = repulsion
+        self.attraction = attraction
+        self.speed_threshold = speed_threshold
+        self.acceleration = acceleration
+        self.number_of_boids = number_of_boids
+
+    def initialise_random(self):
+        for i in range(1,self.number_of_boids):
             self.boids.append(Boid(
                         random.uniform(-450,50.0), \
                         random.uniform(300.0,600.0), \
                         random.uniform(0,10.0), \
                         random.uniform(-20.0,20.0)
-                        )
-                        )
-        self.repulsion = repulsion
-        self.attraction = attraction
-        self.speed_threshold = speed_threshold
-        self.acceleration = acceleration
-        self.number_of_boids = Boid.get_number_of_boids()
+                        ))
+
+    def initialise_from_data(self, boid_data):
+        self.number_of_boids = len(boid_data[0])
+        for boid in range(self.number_of_boids):
+            self.boids.append(Boid(boid_data[0][boid], \
+                            boid_data[1][boid], \
+                            boid_data[2][boid], \
+                            boid_data[3][boid]))
 
     def move_boids_middle(self):
         for i in self.boids:
@@ -94,13 +99,7 @@ class Boids(object):
             i.x = i.x + i.xv
             i.y = i.y + i.yv
 
-# Deliberately terrible code for teaching purposes
 
-boids_x=[random.uniform(-450,50.0) for x in range(50)]
-boids_y=[random.uniform(300.0,600.0) for x in range(50)]
-boid_x_velocities=[random.uniform(0,10.0) for x in range(50)]
-boid_y_velocities=[random.uniform(-20.0,20.0) for x in range(50)]
-boids=(boids_x,boids_y,boid_x_velocities,boid_y_velocities)
 
 def move_boids(boid_velocities, boid_position, centre_attraction):
     number_of_boids = len(boid_position)
@@ -135,22 +134,3 @@ def update_boids(boids, bird_repulsion, centre_attraction, speed_threshold, acce
     for i in array_of_boids:
         xs[i]=xs[i]+xvs[i]
         ys[i]=ys[i]+yvs[i]
-
-
-figure=plt.figure()
-axes=plt.axes(xlim=(-500,1500), ylim=(-500,1500))
-scatter=axes.scatter(boids[0],boids[1])
-
-def animate(frame):
-    repulsion = 100
-    attraction = 0.01
-    speed_threshold = 10000
-    acceleration = 0.125
-    update_boids(boids, repulsion, attraction, speed_threshold, acceleration)
-    scatter.set_offsets(zip(boids[0],boids[1]))
-
-
-anim = animation.FuncAnimation(figure, animate, frames=50, interval=50)
-
-if __name__ == "__main__":
-    plt.show()
